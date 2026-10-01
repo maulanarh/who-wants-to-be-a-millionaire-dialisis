@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kuis Jutawan Dialisis</title>
+<style>
+:root{--gold:#f2c14e;--navy:#050c3a;--blue:#10206b;--ok:#1f9d47;--bad:#c0262d;--or:#e8890c}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:#fff;font-family:'Trebuchet MS','Segoe UI',sans-serif;background:radial-gradient(ellipse at 50% 20%,#1a2c8f 0,#0a1250 45%,#02031a 100%) fixed}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+header{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 16px;max-width:1100px;margin:auto}
+header h1{font-size:1.1rem;margin:0;color:var(--gold);letter-spacing:.5px}
+.tg{display:flex;gap:6px;flex-wrap:wrap}
+.tg button{background:#0b1664;border:1px solid #3a4aa8;border-radius:999px;padding:5px 12px;font-size:.8rem}
+.tg button[aria-pressed=true]{background:var(--gold);color:#1a1200;border-color:var(--gold)}
+.wrap{max-width:1100px;margin:auto;padding:8px 16px 30px}
+.hide{display:none!important}
+.card{border:2px solid var(--gold);border-radius:28px;background:linear-gradient(#10206b,#050c3a);padding:20px 24px}
+.center{text-align:center;max-width:640px;margin:6vh auto}
+.center h2{font-size:clamp(1.8rem,5vw,2.8rem);margin:.2em 0;color:var(--gold)}
+.big{background:linear-gradient(#f7d77a,#d9a21f);color:#2a1d00;border:0;border-radius:999px;padding:12px 34px;font-weight:700;font-size:1.1rem;margin-top:14px}
+.big:disabled{opacity:.4;cursor:not-allowed}
+.msg{color:#b8c2ff;font-size:.9rem;line-height:1.5}
+#game{display:grid;grid-template-columns:1fr 210px;gap:18px}
+#hud{display:flex;justify-content:space-between;color:var(--gold);font-weight:700;margin-bottom:10px}
+.ll{display:flex;gap:10px;margin-bottom:12px}
+.ll button{flex:1;background:#0b1664;border:2px solid var(--gold);border-radius:999px;padding:8px 4px;font-size:.85rem;font-weight:700}
+.ll button:disabled{opacity:.35;text-decoration:line-through;cursor:not-allowed}
+.cat{font-size:.8rem;color:#9fb0ff;margin-bottom:6px}
+#q{font-size:clamp(1rem,2.2vw,1.25rem);line-height:1.55;margin:0}
+#ops{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+.opt{display:flex;gap:10px;text-align:left;background:linear-gradient(#10206b,#050c3a);border:2px solid #8a93d6;border-radius:18px;padding:12px 16px;font-size:.98rem;line-height:1.4;transition:background .2s}
+.opt b{color:var(--gold);flex:none}
+.opt:hover:not(:disabled){border-color:var(--gold)}
+.opt.sel{background:var(--or);color:#1a0d00;border-color:var(--or)}.opt.sel b{color:#1a0d00}
+.opt.lock{background:var(--or);color:#1a0d00;animation:bl .5s infinite alternate}
+.opt.ok{background:var(--ok);border-color:#6fe39a;animation:none}
+.opt.bad{background:var(--bad);border-color:#ff8a8f;animation:none}
+.opt.gone{visibility:hidden}
+@keyframes bl{to{background:#ffc65c}}
+.act{display:flex;gap:10px;flex-wrap:wrap}
+.act button{border:2px solid var(--gold);background:transparent;border-radius:999px;padding:8px 20px;font-weight:700}
+#lockB{background:var(--gold);color:#1a1200}
+button:disabled{opacity:.4;cursor:not-allowed}
+#aid,#exp{margin-top:14px;border:2px solid #8a93d6;border-radius:18px;padding:14px 18px;background:#08124f}
+#exp h3,#aid h3{margin:0 0 6px;color:var(--gold);font-size:1rem}
+#exp p{margin:0 0 8px;line-height:1.55}.src{font-size:.8rem;color:#9fb0ff}
+.bar{display:flex;align-items:center;gap:8px;margin:4px 0}.bar i{display:block;height:16px;background:var(--gold);border-radius:4px;transition:width .8s}.bar span{width:2.2em}
+#lad{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:3px}
+#lad li{display:flex;justify-content:space-between;padding:4px 10px;border-radius:6px;font-size:.85rem;color:var(--or)}
+#lad li.safe{color:#fff}
+#lad li.done{opacity:.45}
+#lad li.cur{background:var(--or);color:#1a0d00;font-weight:700}
+#res{font-size:clamp(2rem,6vw,3rem);color:var(--gold);font-weight:700}
+@media(max-width:800px){#game{grid-template-columns:1fr}#lad{display:none}#ops{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.opt.lock{animation:none}.bar i{transition:none}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Kuis Jutawan Dialisis</h1>
+  <div class="tg">
+    <button id="tMus" aria-pressed="true">Musik</button>
+    <button id="tSfx" aria-pressed="true">Efek suara</button>
+    <button id="tTts" aria-pressed="false">Bacakan soal</button>
+  </div>
+</header>
+<div class="wrap">
+
+<section id="sStart" class="center">
+  <p class="msg">Jawab 15 soal dialisis, makin sulit, makin besar hadiahnya.</p>
+  <h2>Siapa Berani Jadi Jutawan?</h2>
+  <p class="msg" id="ldMsg">Memuat soal.json ...</p>
+  <div id="pick" class="hide msg">
+    <p>Soal tidak bisa dimuat otomatis (biasanya karena file dibuka langsung dari folder). Pilih file <b>soal.json</b> secara manual:</p>
+    <input type="file" id="fi" accept=".json,application/json">
+  </div>
+  <button class="big" id="go" disabled>Mulai Main</button>
+  <p class="msg">Bantuan: 50:50, Telepon Sejawat, dan Tanya Penonton. Ada dua titik aman: soal 5 dan soal 10.</p>
+</section>
+
+<section id="game" class="hide">
+  <div>
+    <div id="hud"><span id="hq"></span><span id="hp"></span></div>
+    <div class="ll">
+      <button id="l50">50:50</button>
+      <button id="lph">Telepon Sejawat</button>
+      <button id="lau">Tanya Penonton</button>
+    </div>
+    <div class="card"><div class="cat" id="cat"></div><p id="q"></p></div>
+    <div id="ops"></div>
+    <div class="act">
+      <button id="lockB" disabled>Kunci jawaban</button>
+      <button id="walk">Ambil uang</button>
+    </div>
+    <div id="aid" class="hide" role="status"></div>
+    <div id="exp" class="hide"></div>
+  </div>
+  <ol id="lad" aria-label="Tangga hadiah"></ol>
+</section>
+
+<section id="sEnd" class="center hide">
+  <p class="msg" id="eT"></p>
+  <div id="res"></div>
+  <p class="msg" id="eS"></p>
+  <button class="big" id="again">Main lagi</button>
+</section>
+
+</div>
+<script>
+const $=s=>document.querySelector(s);
+const P=[5e5,1e6,2e6,3e6,5e6,1e7,2e7,4e7,8e7,16e7,25e7,35e7,5e8,75e7,1e9];
+const rp=n=>'Rp '+n.toLocaleString('id-ID');
+const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const L='ABCD';
+let DATA=[],S={};
+
+/* ===== AUDIO (disintesis dengan Web Audio, tanpa file eksternal) ===== */
+const A={c:null,m:null,mus:true,sfx:true,bt:null,nx:0,st:0,bpm:70,
+ init(){if(!this.c){const C=window.AudioContext||window.webkitAudioContext;if(!C)return;this.c=new C();this.m=this.c.createGain();this.m.gain.value=.6;this.m.connect(this.c.destination)}
+  if(this.c.state==='suspended')this.c.resume()},
+ t(){return this.c.currentTime},
+ o(f,t,d,ty,v,f2){const c=this.c,os=c.createOscillator(),g=c.createGain();os.type=ty||'sine';os.frequency.setValueAtTime(f,t);
+  if(f2)os.frequency.exponentialRampToValueAtTime(f2,t+d);
+  g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(v||.15,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+d);
+  os.connect(g);g.connect(this.m);os.start(t);os.stop(t+d+.05)},
+ nz(t,d,v,fq){const c=this.c,n=c.sampleRate*d|0,b=c.createBuffer(1,n,c.sampleRate),x=b.getChannelData(0);
+  for(let i=0;i<n;i++)x[i]=(Math.random()*2-1)*(1-i/n);
+  const s=c.createBufferSource(),f=c.createBiquadFilter(),g=c.createGain();f.type='bandpass';f.frequency.value=fq;g.gain.value=v;
+  s.buffer=b;s.connect(f);f.connect(g);g.connect(this.m);s.start(t)},
+ ready(){return this.c&&this.sfx},
+ intro(){if(!this.ready())return;const t=this.t()+.05;
+  [196,261.6,329.6,392,523.3].forEach((f,i)=>this.o(f,t+i*.18,.5,'triangle',.18));
+  [261.6,329.6,392,523.3].forEach(f=>this.o(f,t+1,1.4,'sawtooth',.05))},
+ lock(){if(!this.ready())return;const t=this.t();this.o(220,t,.3,'square',.1);this.o(330,t+.12,.5,'square',.09)},
+ ok(){if(!this.ready())return;const t=this.t();
+  [523.3,659.3,784,1046.5].forEach((f,i)=>this.o(f,t+i*.14,.3,'sawtooth',.1));
+  [523.3,659.3,784,1046.5].forEach(f=>this.o(f,t+.6,1.2,'sawtooth',.06))},
+ bad(){if(!this.ready())return;const t=this.t();this.o(320,t,1,'sawtooth',.18,60);this.o(160,t+.1,1.2,'square',.1,40)},
+ life(){if(!this.ready())return;const t=this.t();this.o(400,t,.35,'sine',.15,1400);this.o(1400,t+.3,.3,'triangle',.1,600)},
+ ring(){if(!this.ready())return;const t=this.t();for(let i=0;i<4;i++){this.o(880,t+i*.5,.12,'sine',.1);this.o(1100,t+i*.5+.14,.12,'sine',.1)}},
+ win(){if(!this.ready())return;const t=this.t();
+  [523.3,659.3,784,1046.5,784,1046.5,1318.5].forEach((f,i)=>this.o(f,t+i*.17,.4,'sawtooth',.1));
+  [523.3,659.3,784,1046.5].forEach(f=>this.o(f,t+1.3,2,'sawtooth',.06));
+  for(let i=0;i<60;i++)this.nz(t+Math.random()*3.5,.05,.12,1800+Math.random()*2500)},
+ clap(){if(!this.ready())return;const t=this.t();for(let i=0;i<30;i++)this.nz(t+Math.random()*2,.05,.1,1800+Math.random()*2500)},
+ sched(){const c=this.c;while(this.nx<c.currentTime+.3){
+  const s=this.st++,r=[55,55,65.4,49][(s>>3)%4],t=this.nx;
+  if(s%2===0)this.o(r*2,t,.4,'triangle',.12);
+  if(s%4===0)this.o(90,t,.15,'sine',.25,40);
+  this.o(r*[8,9.6,12,9.6][s%4],t,.2,'triangle',.035);
+  this.nx+=60/this.bpm/2}},
+ start(){if(!this.c||!this.mus)return;this.stop();this.nx=this.t()+.05;this.st=0;this.bt=setInterval(()=>this.sched(),100)},
+ stop(){clearInterval(this.bt);this.bt=null}
+};
+
+function say(t){if(!S.tts||!window.speechSynthesis)return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='id-ID';speechSynthesis.speak(u)}
+
+/* ===== MUAT SOAL ===== */
+function setData(arr){
+  DATA=(Array.isArray(arr)?arr:[]).filter(x=>x&&x.q&&Array.isArray(x.o)&&x.o.length>=4&&Number.isInteger(x.a)&&x.a>=0&&x.a<4);
+  if(DATA.length<15){$('#ldMsg').textContent='File soal tidak valid atau kurang dari 15 soal.';$('#pick').classList.remove('hide');return}
+  $('#ldMsg').textContent=DATA.length+' soal siap dimainkan.';$('#pick').classList.add('hide');$('#go').disabled=false}
+fetch('soal.json').then(r=>{if(!r.ok)throw 0;return r.json()}).then(setData)
+  .catch(()=>{$('#ldMsg').textContent='';$('#pick').classList.remove('hide')});
+$('#fi').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();
+  r.onload=()=>{try{setData(JSON.parse(r.result))}catch(_){$('#ldMsg').textContent='File bukan JSON yang valid.'}};r.readAsText(f)};
+
+/* ===== LOGIKA GAME ===== */
+function show(id){['sStart','game','sEnd'].forEach(s=>$('#'+s).classList.toggle('hide',s!==id))}
+function pickLevels(){
+  // Tingkat kesulitan: soal kasus (field v) dan soal panjang dianggap lebih sulit
+  const sc=x=>x.q.length+(x.v?120:0)+Math.random()*30;
+  const s=DATA.map(x=>[sc(x),x]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]),n=s.length,out=[];
+  for(let l=0;l<15;l++){const a=Math.floor(l*n/15),b=Math.floor((l+1)*n/15);out.push(s[a+Math.random()*(b-a)|0])}
+  return out}
+function ladder(){
+  $('#lad').innerHTML=P.map((p,i)=>`<li data-i="${i}" class="${i===4||i===9?'safe':''}"><span>${i+1}</span><span>${rp(p)}</span></li>`).reverse().join('')}
+function newGame(){
+  A.init();
+  S={qs:pickLevels(),i:0,sel:null,lock:false,ok:0,used:{},tts:S.tts,done:false};
+  ['l50','lph','lau'].forEach(i=>$('#'+i).disabled=false);
+  ladder();show('game');A.intro();setTimeout(ask,1500)}
+function ask(){
+  const q=S.qs[S.i];S.sel=null;S.lock=false;S.done=false;
+  S.opts=shuf(q.o.slice(0,4).map((t,k)=>({t,c:k===q.a})));
+  $('#cat').textContent=q.k||'';$('#q').textContent=q.q;
+  $('#ops').innerHTML='';
+  S.opts.forEach((o,k)=>{const b=document.createElement('button');b.className='opt';b.dataset.k=k;
+    b.innerHTML='<b>'+L[k]+':</b><span></span>';b.lastChild.textContent=o.t;b.onclick=()=>pick(k);$('#ops').append(b)});
+  $('#hq').textContent='Soal '+(S.i+1)+' dari 15';$('#hp').textContent=rp(P[S.i]);
+  document.querySelectorAll('#lad li').forEach(li=>{const i=+li.dataset.i;li.classList.toggle('cur',i===S.i);li.classList.toggle('done',i<S.i)});
+  $('#lockB').disabled=true;$('#walk').disabled=S.i===0;
+  $('#exp').classList.add('hide');$('#aid').classList.add('hide');
+  A.bpm=70+S.i*3;A.start();
+  say(q.q+'. '+S.opts.map((o,k)=>L[k]+', '+o.t).join('. '))}
+function pick(k){
+  if(S.lock)return;S.sel=k;
+  document.querySelectorAll('.opt').forEach((b,i)=>b.classList.toggle('sel',i===k));
+  $('#lockB').disabled=false}
+function lockIn(){
+  if(S.lock||S.sel===null)return;S.lock=true;
+  if(window.speechSynthesis)speechSynthesis.cancel();
+  A.lock();A.bpm=130;
+  document.querySelectorAll('.opt').forEach((b,i)=>{b.disabled=true;b.classList.remove('sel');if(i===S.sel)b.classList.add('lock')});
+  ['lockB','walk','l50','lph','lau'].forEach(i=>$('#'+i).disabled=true);
+  setTimeout(reveal,3000)}
+function reveal(){
+  A.stop();const q=S.qs[S.i],good=S.opts[S.sel].c,bs=document.querySelectorAll('.opt');
+  bs.forEach((b,i)=>{b.classList.remove('lock');if(S.opts[i].c)b.classList.add('ok');else if(i===S.sel)b.classList.add('bad')});
+  good?(A.ok(),S.ok++):A.bad();
+  S.good=good;
+  const last=good&&S.i===14;
+  $('#exp').innerHTML='<h3>'+(good?'Jawaban benar!':'Jawaban belum tepat')+'</h3><p></p><div class="src"></div><div class="act" style="margin-top:10px"><button id="nx" class="big" style="margin:0;padding:8px 24px;font-size:1rem"></button></div>';
+  $('#exp p').textContent=q.e||'';$('#exp .src').textContent=q.s?'Sumber: '+q.s:'';
+  $('#nx').textContent=good&&!last?'Lanjut ke soal berikutnya':'Lihat hasil';
+  $('#nx').onclick=next;$('#exp').classList.remove('hide');$('#nx').focus()}
+function next(){
+  if(!S.good)return end(S.i>=10?P[9]:S.i>=5?P[4]:0,'lose');
+  if(S.i===14)return end(P[14],'win');
+  S.i++;ask()}
+function end(amt,why){
+  A.stop();show('sEnd');
+  $('#eT').textContent=why==='win'?'Selamat! Anda menjawab semua soal dengan benar.':why==='walk'?'Anda memilih berhenti dan membawa pulang':'Jawaban belum tepat. Anda membawa pulang';
+  $('#res').textContent=rp(amt);
+  $('#eS').textContent=S.ok+' dari '+(why==='lose'?S.i+1:why==='win'?15:S.i)+' soal terjawab benar.';
+  why==='win'?A.win():amt>0?A.clap():0}
+function walk(){if(S.lock||S.i===0)return;if(confirm('Ambil uang '+rp(P[S.i-1])+' dan berhenti?'))end(P[S.i-1],'walk')}
+
+/* ===== BANTUAN ===== */
+function aid(h){$('#aid').innerHTML=h;$('#aid').classList.remove('hide')}
+function vis(){return S.opts.map((o,k)=>k).filter(k=>!document.querySelectorAll('.opt')[k].classList.contains('gone'))}
+function f50(){
+  if(S.lock)return;A.init();A.life();S.used.f=1;$('#l50').disabled=true;
+  const w=shuf(S.opts.map((o,k)=>k).filter(k=>!S.opts[k].c)).slice(0,2),bs=document.querySelectorAll('.opt');
+  w.forEach(k=>{bs[k].classList.add('gone');bs[k].disabled=true});
+  if(w.includes(S.sel)){S.sel=null;bs.forEach(b=>b.classList.remove('sel'));$('#lockB').disabled=true}}
+function phone(){
+  if(S.lock)return;A.init();A.ring();$('#lph').disabled=true;
+  const v=vis(),c=S.opts.findIndex(o=>o.c),p=Math.max(.5,.92-S.i*.03);
+  const g=Math.random()<p?c:shuf(v.filter(k=>k!==c))[0]??c,sure=Math.random()<p;
+  setTimeout(()=>aid('<h3>Telepon Sejawat</h3><p>'+(sure?'Saya cukup yakin jawabannya <b>'+L[g]+'</b>.':'Hmm, saya ragu. Kalau harus memilih, saya pilih <b>'+L[g]+'</b>.')+'</p>'),1000)}
+function audience(){
+  if(S.lock)return;A.init();A.life();$('#lau').disabled=true;
+  const v=vis(),c=S.opts.findIndex(o=>o.c);
+  let w=Math.min(.95,Math.max(.3,.85-S.i*.035+(Math.random()-.5)*.1));
+  const o=v.filter(k=>k!==c),r=o.map(()=>Math.random()+.2),sm=r.reduce((a,b)=>a+b,0),pc={};
+  pc[c]=Math.round(w*100);o.forEach((k,i)=>pc[k]=Math.round((1-w)*100*r[i]/sm));
+  aid('<h3>Suara Penonton</h3>'+v.map(k=>'<div class="bar"><b>'+L[k]+'</b><i style="width:0" data-w="'+pc[k]+'"></i><span>'+pc[k]+'%</span></div>').join(''));
+  setTimeout(()=>document.querySelectorAll('#aid i').forEach(i=>i.style.width=Math.max(i.dataset.w,2)*.7+'%'),50)}
+
+/* ===== KONTROL ===== */
+$('#go').onclick=newGame;$('#again').onclick=newGame;
+$('#lockB').onclick=lockIn;$('#walk').onclick=walk;
+$('#l50').onclick=f50;$('#lph').onclick=phone;$('#lau').onclick=audience;
+function tg(id,fn){const b=$(id);b.onclick=()=>{const v=b.getAttribute('aria-pressed')!=='true';b.setAttribute('aria-pressed',v);fn(v)}}
+tg('#tMus',v=>{A.mus=v;v?(S.qs&&!$('#game').classList.contains('hide')&&!S.lock&&!S.done&&A.start()):A.stop()});
+tg('#tSfx',v=>A.sfx=v);
+tg('#tTts',v=>{S.tts=v;if(!v&&window.speechSynthesis)speechSynthesis.cancel()});
+document.addEventListener('keydown',e=>{
+  if($('#game').classList.contains('hide'))return;
+  const k=L.indexOf(e.key.toUpperCase());
+  if(e.key.length===1&&k>-1&&!S.lock&&!document.querySelectorAll('.opt')[k]?.classList.contains('gone'))pick(k);
+  else if(e.key==='Enter'&&!$('#lockB').disabled)lockIn()});
+</script>
+</body>
+</html>
